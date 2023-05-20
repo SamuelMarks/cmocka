@@ -2702,11 +2702,11 @@ typedef union {
     /** Holds integral types */
     uintmax_t uint_val;
     /** Holds real/floating-pointing types*/
-    double real_val; // TODO: Should we use `long double` instead
+    double real_val; /* TODO: Should we use `long double` instead? */
     /** Holds pointer data */
     const void *ptr;
-    // The following aren't used by CMocka currently, but are added to avoid
-    // breaking ABI compatibility in the future
+    /* The following aren't used by CMocka currently, but are added to avoid
+     * breaking ABI compatibility in the future */
     /** Holds function pointer data */
     void *(*func)(void);
 } CMockaValueData;
@@ -2732,7 +2732,7 @@ typedef enum UnitTestFunctionType {
     UNIT_TEST_FUNCTION_TYPE_SETUP,
     UNIT_TEST_FUNCTION_TYPE_TEARDOWN,
     UNIT_TEST_FUNCTION_TYPE_GROUP_SETUP,
-    UNIT_TEST_FUNCTION_TYPE_GROUP_TEARDOWN,
+    UNIT_TEST_FUNCTION_TYPE_GROUP_TEARDOWN
 } UnitTestFunctionType;
 
 /*
@@ -2997,7 +2997,7 @@ enum cm_message_output {
     CM_OUTPUT_STDOUT = 1, /* API compatiblity */
     CM_OUTPUT_SUBUNIT = 2,
     CM_OUTPUT_TAP = 4,
-    CM_OUTPUT_XML = 8,
+    CM_OUTPUT_XML = 8
 };
 
 #ifdef DOXYGEN

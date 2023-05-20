@@ -74,11 +74,11 @@
 #define MALLOC_FREE_PATTERN 0xCD
 /* Alignment of allocated blocks.  NOTE: This must be base2. */
 #ifndef MALLOC_ALIGNMENT
-// TODO: switch to alignof(max_align_t) once C11 is the minimum supported
-// version On most platforms, `long double` is the largest scalar type, and has
-// an alignment of 16 bytes. However, sizeof(long double) may be 12, which is
-// not a power of 2. As a temporary measure, we can over-align to 16-bytes on
-// all platforms.
+/* TODO: switch to alignof(max_align_t) once C11 is the minimum supported
+ * version On most platforms, `long double` is the largest scalar type, and has
+ * an alignment of 16 bytes. However, sizeof(long double) may be 12, which is
+ * not a power of 2. As a temporary measure, we can over-align to 16-bytes on
+ * all platforms. */
 #define MALLOC_ALIGNMENT 16
 #endif
 
@@ -1165,7 +1165,8 @@ void _expect_check(
         CheckParameterEvent * const event, const int count) {
     CheckParameterEvent * const check =
         event ? event : (CheckParameterEvent*)malloc(sizeof(*check));
-    const char* symbols[] = {function, parameter};
+    const char* symbols[2];
+    symbols[0] = function, symbols[1] = parameter;
     check->parameter_name = parameter;
     check->check_value = check_function;
     check->check_value_data = check_data;
@@ -1212,8 +1213,8 @@ static int float_compare(const float left,
     float diff = left - right;
     diff = (diff >= 0.f) ? diff : -diff;
 
-    // Check if the numbers are really close -- needed
-        // when comparing numbers near zero.
+    /* Check if the numbers are really close -- needed */
+        /* when comparing numbers near zero. */
         if (diff <= epsilon) {
             return 1;
     }
@@ -2001,42 +2002,45 @@ void _check_expected(
         const char * const function_name, const char * const parameter_name,
         const char* file, const int line, const CMockaValueData value) {
     void *result = NULL;
-    const char* symbols[] = {function_name, parameter_name};
-    const int rc = get_symbol_value(&global_function_parameter_map_head,
-                                    symbols, 2, &result);
-    if (rc) {
-        CheckParameterEvent * const check = (CheckParameterEvent*)result;
-        int check_succeeded;
-        global_last_parameter_location = check->location;
-        check_succeeded = check->check_value(value, check->check_value_data);
-        if (rc == 1) {
-            free(check);
-        }
-        if (!check_succeeded) {
-            cmocka_print_error(SOURCE_LOCATION_FORMAT
-                           ": error: Check of parameter %s, function %s failed\n"
-                           SOURCE_LOCATION_FORMAT
-                           ": note: Expected parameter declared here\n",
-                           file, line,
-                           parameter_name, function_name,
-                           global_last_parameter_location.file,
-                           global_last_parameter_location.line);
-            _fail(file, line);
-        }
-    } else {
-        cmocka_print_error(SOURCE_LOCATION_FORMAT ": error: Could not get value "
-                    "to check parameter %s of function %s\n", file, line,
-                    parameter_name, function_name);
-        if (source_location_is_set(&global_last_parameter_location)) {
-            cmocka_print_error(SOURCE_LOCATION_FORMAT
-                        ": note: Previously declared parameter value was declared here\n",
-                        global_last_parameter_location.file,
-                        global_last_parameter_location.line);
+    const char* symbols[2];
+    symbols[0]=function_name, symbols[1]=parameter_name;
+    {
+        const int rc = get_symbol_value(&global_function_parameter_map_head,
+                                        symbols, 2, &result);
+        if (rc) {
+            CheckParameterEvent * const check = (CheckParameterEvent*)result;
+            int check_succeeded;
+            global_last_parameter_location = check->location;
+            check_succeeded = check->check_value(value, check->check_value_data);
+            if (rc == 1) {
+                free(check);
+            }
+            if (!check_succeeded) {
+                cmocka_print_error(SOURCE_LOCATION_FORMAT
+                               ": error: Check of parameter %s, function %s failed\n"
+                               SOURCE_LOCATION_FORMAT
+                               ": note: Expected parameter declared here\n",
+                               file, line,
+                               parameter_name, function_name,
+                               global_last_parameter_location.file,
+                               global_last_parameter_location.line);
+                _fail(file, line);
+            }
         } else {
-            cmocka_print_error("There were no previously declared parameter values "
-                        "for this test.\n");
+            cmocka_print_error(SOURCE_LOCATION_FORMAT ": error: Could not get value "
+                        "to check parameter %s of function %s\n", file, line,
+                        parameter_name, function_name);
+            if (source_location_is_set(&global_last_parameter_location)) {
+                cmocka_print_error(SOURCE_LOCATION_FORMAT
+                            ": note: Previously declared parameter value was declared here\n",
+                            global_last_parameter_location.file,
+                            global_last_parameter_location.line);
+            } else {
+                cmocka_print_error("There were no previously declared parameter values "
+                            "for this test.\n");
+            }
+            exit_test(true);
         }
-        exit_test(true);
     }
 }
 
@@ -2526,8 +2530,9 @@ void _test_free(void* const ptr, const char* file, const int line) {
                               sizeof(struct MallocBlockInfoData));
     /* Check the guard blocks. */
     {
-        char *guards[2] = {block - MALLOC_GUARD_SIZE,
-                           block + block_info.data->size};
+        char *guards[2];
+        guards[0] = block - MALLOC_GUARD_SIZE,
+        guards[1] = block + block_info.data->size;
         for (i = 0; i < ARRAY_SIZE(guards); i++) {
             unsigned int j;
             char * const guard = guards[i];
@@ -2867,7 +2872,7 @@ enum cm_printf_type {
     PRINTF_TEST_SUCCESS,
     PRINTF_TEST_FAILURE,
     PRINTF_TEST_ERROR,
-    PRINTF_TEST_SKIPPED,
+    PRINTF_TEST_SKIPPED
 };
 
 static int xml_printed;
@@ -2913,9 +2918,9 @@ static void cmprintf_group_finish_xml(const char *group_name,
 #endif /* _MSC_VER */
         if (
 #ifdef _MSC_VER
-            fp == NULL
-#else
             err != 0
+#else
+            fp == NULL
 #endif /* _MSC_VER */
             ) {
 #ifdef _MSC_VER
@@ -2945,9 +2950,9 @@ static void cmprintf_group_finish_xml(const char *group_name,
 #endif /* _MSC_VER */
                 if (
 #ifdef _MSC_VER
-                    fp != NULL
-#else
                     err == 0
+#else
+                    fp != NULL
 #endif /* _MSC_VER */
                     ) {
                     file_opened = 1;
@@ -3467,17 +3472,14 @@ static int cmocka_run_group_fixture(const char *function_name,
 
 static int cmocka_run_one_tests(struct CMUnitTestState *test_state)
 {
-#ifdef HAVE_STRUCT_TIMESPEC
-    struct timespec start = {
-        .tv_sec = 0,
-        .tv_nsec = 0,
-    };
-    struct timespec finish = {
-        .tv_sec = 0,
-        .tv_nsec = 0,
-    };
-#endif
     int rc = 0;
+#ifdef HAVE_STRUCT_TIMESPEC
+    struct timespec start, finish;
+    start.tv_sec = 0,
+    start.tv_nsec = 0,
+    finish.tv_sec = 0,
+    finish.tv_nsec = 0;
+#endif
 
     /* Run setup */
     if (test_state->test->setup_func != NULL) {
