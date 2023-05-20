@@ -121,7 +121,7 @@
  * with value the conversion of ptr.
  */
 #define declare_initialize_value_pointer_pointer(name, ptr_value) \
-    CMockaValueData name = {.ptr = (ptr_value)};
+    CMockaValueData name; name.ptr = ptr_value
 
 /* Cast a uintmax_t to pointer_type. */
 #define cast_cmocka_value_to_pointer(pointer_type, cmocka_value_data) \
@@ -397,12 +397,23 @@ struct CMUnitTestState {
 /* Exit the currently executing test. */
 static void exit_test(const bool quit_application)
 {
-    const char *env = getenv("CMOCKA_TEST_ABORT");
     int abort_test = 0;
+#ifdef _MSC_VER
+    {
+        char *buf = NULL;
+        size_t sz = 0;
+        if (_dupenv_s(&buf, &sz, "CMOCKA_TEST_ABORT") == 0 && buf != NULL) {
+            abort_test = (buf[0] == '1');
+            free(buf);
+        }
+    }
+#else
+    const char *env = getenv("CMOCKA_TEST_ABORT");
 
     if (env != NULL && strlen(env) == 1) {
         abort_test = (env[0] == '1');
     }
+#endif
 
     if (global_skip_test == 0 && abort_test == 1) {
         if (cm_error_message != NULL) {
@@ -602,13 +613,12 @@ static void fail_if_leftover_values(const char *test_name) {
 
 
 static void teardown_testing(const char *test_name) {
+    uintmax_t symbol_map_value_data = 0, symbol_map_value_data_1 = 1;
     (void)test_name;
-    uintmax_t symbol_map_value_data = 0;
     list_free(&global_function_result_map_head,
               free_symbol_map_value,
               &symbol_map_value_data);
     initialize_source_location(&global_last_mock_value_location);
-    uintmax_t symbol_map_value_data_1 = 1;
     list_free(&global_function_parameter_map_head,
               free_symbol_map_value,
               &symbol_map_value_data_1);
@@ -1024,12 +1034,14 @@ CMockaValueData _mock(const char *const function,
                 exit_test(true);
             }
         }
-        const CMockaValueData value = symbol->value;
-        global_last_mock_value_location = symbol->location;
-        if (rc == 1) {
-            free(symbol);
+        {
+            const CMockaValueData value = symbol->value;
+            global_last_mock_value_location = symbol->location;
+            if (rc == 1) {
+                free(symbol);
+            }
+            return value;
         }
-        return value;
     } else {
         cmocka_print_error(SOURCE_LOCATION_FORMAT ": error: Could not get value "
                        "to mock function %s\n", file, line, function);
@@ -1044,7 +1056,11 @@ CMockaValueData _mock(const char *const function,
         }
         exit_test(true);
     }
-    return (CMockaValueData){.ptr = NULL};
+    {
+        CMockaValueData data = {0};
+        data.ptr = NULL;
+        return data;
+    }
 }
 
 /* Ensure that function is being called in proper order */
@@ -1753,7 +1769,7 @@ static int check_in_range(const CMockaValueData value,
                                               check_value_data);
     assert_non_null(check_integer_range);
 
-    return uint_in_range_display_error(value.uint_val,
+    return (int)uint_in_range_display_error(value.uint_val,
                                        check_integer_range->minimum,
                                        check_integer_range->maximum);
 }
@@ -1814,7 +1830,7 @@ void _expect_not_in_range(
  * expected value. */
 static int check_value(const CMockaValueData value,
                        const CMockaValueData check_value_data) {
-    return uint_values_equal_display_error(value.uint_val, check_value_data.uint_val);
+    return (int)uint_values_equal_display_error(value.uint_val, check_value_data.uint_val);
 }
 
 
@@ -1823,7 +1839,9 @@ void _expect_value(
         const char* const function, const char* const parameter,
         const char* const file, const int line,
         const uintmax_t value, const int count) {
-    _expect_check(function, parameter, file, line, check_value, (CMockaValueData){.uint_val = value}, NULL,
+    CMockaValueData check_data;
+    check_data.uint_val = value;
+    _expect_check(function, parameter, file, line, check_value, check_data, NULL,
                   count);
 }
 
@@ -1832,7 +1850,7 @@ void _expect_value(
  * expected value. */
 static int check_not_value(const CMockaValueData value,
                            const CMockaValueData check_value_data) {
-    return uint_values_not_equal_display_error(value.uint_val, check_value_data.uint_val);
+    return (int)uint_values_not_equal_display_error(value.uint_val, check_value_data.uint_val);
 }
 
 
@@ -1841,8 +1859,10 @@ void _expect_not_value(
         const char* const function, const char* const parameter,
         const char* const file, const int line,
         const uintmax_t value, const int count) {
+    CMockaValueData check_data;
+    check_data.uint_val = value;
     _expect_check(function, parameter, file, line, check_not_value,
-                  (CMockaValueData){.uint_val = value},
+                  check_data,
                   NULL, count);
 }
 
@@ -1970,7 +1990,9 @@ static int check_any(const CMockaValueData value,
 void _expect_any(
         const char* const function, const char* const parameter,
         const char* const file, const int line, const int count) {
-    _expect_check(function, parameter, file, line, check_any, (CMockaValueData){.ptr = NULL}, NULL,
+    CMockaValueData check_data;
+    check_data.ptr = NULL;
+    _expect_check(function, parameter, file, line, check_any, check_data, NULL,
                   count);
 }
 
@@ -2051,10 +2073,20 @@ void _assert_return_code(const intmax_t result,
 {
     if (result < 0) {
         if (error > 0) {
+#ifdef _MSC_VER
+            char err_msg[BUFSIZ];
+            if ( strerror_s(err_msg, sizeof err_msg, error) != 0 ) {
+                cmocka_print_error("%s < 0, errno(%d): %s\n",
+                                       expression,
+                                       error,
+                                       err_msg);
+            }
+#else
             cmocka_print_error("%s < 0, errno(%d): %s\n",
-                           expression,
-                           error,
-                           strerror(error));
+                               expression,
+                               error,
+                               strerror(error));
+#endif /* _MSC_VER */
         } else {
             cmocka_print_error("%s < 0\n", expression);
         }
@@ -2264,11 +2296,10 @@ void _assert_int_in_set(const intmax_t value,
                         const char *const file,
                         const int line)
 {
-    struct check_integer_set check_integer_set = {
-        .set = values,
-        .size_of_set = number_of_values,
-    };
     bool ok;
+    struct check_integer_set check_integer_set;
+    check_integer_set.set = values,
+    check_integer_set.size_of_set = number_of_values;
 
     ok = int_value_in_set_display_error(value, &check_integer_set, false);
     if (!ok) {
@@ -2282,11 +2313,10 @@ void _assert_int_not_in_set(const intmax_t value,
                             const char *const file,
                             const int line)
 {
-    struct check_integer_set check_integer_set = {
-        .set = values,
-        .size_of_set = number_of_values,
-    };
     bool ok;
+    struct check_integer_set check_integer_set;
+    check_integer_set.set = values,
+    check_integer_set.size_of_set = number_of_values;
 
     ok = int_value_in_set_display_error(value, &check_integer_set, true);
     if (!ok) {
@@ -2300,11 +2330,10 @@ void _assert_uint_in_set(const uintmax_t value,
                          const char *const file,
                          const int line)
 {
-    struct check_unsigned_integer_set check_uint_set = {
-        .set = values,
-        .size_of_set = number_of_values,
-    };
     bool ok;
+    struct check_unsigned_integer_set check_uint_set;
+    check_uint_set.set = values,
+    check_uint_set.size_of_set = number_of_values;
 
     ok = uint_value_in_set_display_error(value, &check_uint_set, false);
     if (!ok) {
@@ -2318,11 +2347,10 @@ void _assert_uint_not_in_set(const uintmax_t value,
                              const char *const file,
                              const int line)
 {
-    struct check_unsigned_integer_set check_uint_set = {
-        .set = values,
-        .size_of_set = number_of_values,
-    };
     bool ok;
+    struct check_unsigned_integer_set check_uint_set;
+    check_uint_set.set = values,
+    check_uint_set.size_of_set = number_of_values;
 
     ok = uint_value_in_set_display_error(value, &check_uint_set, true);
     if (!ok) {
@@ -2586,9 +2614,8 @@ static size_t display_allocated_blocks(const ListNode * const check_point) {
     assert_non_null(check_point->next);
 
     for (node = check_point->next; node != head; node = node->next) {
-        const MallocBlockInfo block_info = {
-            .ptr = discard_const(node->value),
-        };
+        MallocBlockInfo block_info;
+        block_info.ptr = discard_const(node->value);
         assert_non_null(block_info.ptr);
 
         if (allocated_blocks == 0) {
@@ -2614,9 +2641,8 @@ static void free_allocated_blocks(const ListNode * const check_point) {
     assert_non_null(node);
 
     while (node != head) {
-        const MallocBlockInfo block_info = {
-            .ptr = discard_const(node->value),
-        };
+        MallocBlockInfo block_info;
+        block_info.ptr = discard_const(node->value);
         node = node->next;
         free(discard_const_p(char, block_info.data) +
              sizeof(struct MallocBlockInfoData) +
@@ -2726,11 +2752,12 @@ void cmocka_print_error(const char * const format, ...)
 /* Standard output and error print methods. */
 void vprint_message(const char* const format, va_list args)
 {
+#ifdef _WIN32
+    char buffer[4096];
+#endif /* _WIN32 */
     vprintf(format, args);
     fflush(stdout);
 #ifdef _WIN32
-    char buffer[4096];
-
     vsnprintf(buffer, sizeof(buffer), format, args);
     OutputDebugString(buffer);
 #endif /* _WIN32 */
@@ -2739,11 +2766,12 @@ void vprint_message(const char* const format, va_list args)
 
 void vprint_error(const char* const format, va_list args)
 {
+#ifdef _WIN32
+    char buffer[4096];
+#endif /* _WIN32 */
     vfprintf(stderr, format, args);
     fflush(stderr);
 #ifdef _WIN32
-    char buffer[4096];
-
     vsnprintf(buffer, sizeof(buffer), format, args);
     OutputDebugString(buffer);
 #endif /* _WIN32 */
@@ -2779,16 +2807,28 @@ static uint32_t cm_get_output(void)
     if (env_checked) {
         return global_msg_output;
     }
-
+#ifdef _MSC_VER
+    {
+        size_t sz = 0;
+        if (_dupenv_s(&env, &sz, "CMOCKA_MESSAGE_OUTPUT") != 0) {
+            return global_msg_output;
+        } else if (env == NULL || sz == 0 || sz > 32) {
+            return global_msg_output;
+        }
+    }
+#else
     env = getenv("CMOCKA_MESSAGE_OUTPUT");
+#endif /* _MSC_VER */
     if (env == NULL) {
         return global_msg_output;
     }
 
+#ifndef _MSC_VER
     len = strlen(env);
     if (len == 0 || len > 32) {
         return global_msg_output;
     }
+#endif /* !_MSC_VER */
 
     str_output_list = strdup(env);
     if (str_output_list == NULL) {
@@ -2847,11 +2887,18 @@ static void cmprintf_group_finish_xml(const char *group_name,
     char *env;
     size_t i;
 
+#ifdef _MSC_VER
+    size_t sz = 0;
+    if (_dupenv_s(&env, &sz, "CMOCKA_XML_FILE") != 0) {
+#else
     env = getenv("CMOCKA_XML_FILE");
     if (env != NULL) {
+#endif /* _MSC_VER */
         char buf[1024];
         int rc;
-
+#ifdef _MSC_VER
+        errno_t err;
+#endif /* _MSC_VER */
         snprintf(buf, sizeof(buf), "%s", env);
 
         rc = c_strreplace(buf, sizeof(buf), "%g", group_name, &multiple_files);
@@ -2859,10 +2906,30 @@ static void cmprintf_group_finish_xml(const char *group_name,
             snprintf(buf, sizeof(buf), "%s", env);
         }
 
+#ifdef _MSC_VER
+        err  = fopen_s( &fp, buf, "r" );
+#else
         fp = fopen(buf, "r");
-        if (fp == NULL) {
+#endif /* _MSC_VER */
+        if (
+#ifdef _MSC_VER
+            fp == NULL
+#else
+            err != 0
+#endif /* _MSC_VER */
+            ) {
+#ifdef _MSC_VER
+            err  = fopen_s( &fp, buf, "w" );
+#else
             fp = fopen(buf, "w");
-            if (fp != NULL) {
+#endif /* _MSC_VER */
+            if (
+#ifdef _MSC_VER
+                err == 0
+#else
+                fp != NULL
+#endif /* _MSC_VER */
+                ) {
                 file_append = 1;
                 file_opened = 1;
             } else {
@@ -2871,8 +2938,18 @@ static void cmprintf_group_finish_xml(const char *group_name,
         } else {
             fclose(fp);
             if (file_append) {
+#ifdef _MSC_VER
+                err  = fopen_s( &fp, buf, "a" );
+#else
                 fp = fopen(buf, "a");
-                if (fp != NULL) {
+#endif /* _MSC_VER */
+                if (
+#ifdef _MSC_VER
+                    fp != NULL
+#else
+                    err == 0
+#endif /* _MSC_VER */
+                    ) {
                     file_opened = 1;
                     xml_printed = 1;
                 } else {
@@ -3517,11 +3594,13 @@ int _cmocka_run_group_tests(const char *group_name,
                     continue;
                 }
             }
-            cm_tests[total_tests] = (struct CMUnitTestState) {
-                .test = &tests[i],
-                .status = CM_TEST_NOT_STARTED,
-                .state = NULL,
-            };
+            {
+                struct CMUnitTestState state;
+                state.test = &tests[i],
+                state.status = CM_TEST_NOT_STARTED,
+                state.state = NULL;
+                cm_tests[total_tests] = state;
+            }
             total_tests++;
         }
     }
