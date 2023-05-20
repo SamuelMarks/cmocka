@@ -17,6 +17,10 @@ include(DefinePlatformDefaults)
 
 project(cmocka VERSION 1.1.5 LANGUAGES C)
 
+if (MSVC_VERSION STRLESS "1600") # MSVC 2010
+    include_directories("${CMAKE_BINARY_DIR}/include")
+endif (MSVC_VERSION STRLESS "1600")
+
 # global needed variables
 set(APPLICATION_NAME ${PROJECT_NAME})
 
@@ -72,7 +76,7 @@ install(
   FILES
     ${CMAKE_CURRENT_BINARY_DIR}/cmocka.pc
   DESTINATION
-  ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    ${CMAKE_INSTALL_LIBDIR}/pkgconfig
   COMPONENT
     pkgconfig
 )
@@ -90,14 +94,14 @@ write_basic_package_version_file(${PROJECT_NAME}-config-version.cmake
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/cmocka-config.cmake"
               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
         COMPONENT devel)
 
 # Add 'make dist' target which makes sure to invoke cmake before
 add_custom_target(dist
                   COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
 
-# Link combile database for clangd
+# Link compile database for clangd
 execute_process(COMMAND cmake -E create_symlink
                 "${cmocka_BINARY_DIR}/compile_commands.json"
                 "${cmocka_SOURCE_DIR}/compile_commands.json")

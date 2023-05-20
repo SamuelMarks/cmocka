@@ -7,6 +7,9 @@ endif()
 if (WIN32)
     # FIXME: The exception handler doesn't work on Windows
     set(TEST_EXCEPTION_HANDLER FALSE)
+    if (MSVC_VERSION STRLESS "1600") # MSVC 2010
+        include_directories("${CMAKE_BINARY_DIR}/include")
+    endif (MSVC_VERSION STRLESS "1600")
 endif()
 if (CMAKE_BUILD_TYPE)
     string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)

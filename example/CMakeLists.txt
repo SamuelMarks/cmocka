@@ -1,5 +1,9 @@
 project(cmocka-examples C)
 
+if (MSVC_VERSION STRLESS "1600") # MSVC 2010
+    include_directories("${CMAKE_BINARY_DIR}/include")
+endif (MSVC_VERSION STRLESS "1600")
+
 set_source_files_properties(calculator.c
                             allocate_module.c
                             assert_module.c

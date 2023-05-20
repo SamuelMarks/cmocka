@@ -27,6 +27,7 @@ target_include_directories(cmocka
                                ${cmocka_BINARY_DIR}
                            PUBLIC
                                $<BUILD_INTERFACE:${cmocka-header_SOURCE_DIR}>
+                               $<BUILD_INTERFACE:${CMAKE_BINARY_DIR/include}>
                                $<INSTALL_INTERFACE:include>)
 
 target_compile_options(cmocka
@@ -51,10 +52,7 @@ set_target_properties(cmocka PROPERTIES
                       VERSION               ${LIBRARY_VERSION}
                       SOVERSION             ${LIBRARY_SOVERSION}
                       LINK_FLAGS            "${DEFAULT_LINK_FLAGS}"
-                      C_STANDARD            99
-                      C_STANDARD_REQUIRED   ON
-                      # cmocka uses POSIX-2008 C extensions
-                      C_EXTENSIONS          ON
+                      C_STANDARD            90
 )
 
 add_library(cmocka::cmocka ALIAS cmocka)

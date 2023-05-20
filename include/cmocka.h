@@ -30,7 +30,9 @@
 #   ifdef __cplusplus
 extern "C" {
 #   endif   /* __cplusplus */
+#   if _MSC_VER > 1400 /* MSVC 2005 */
 int __stdcall IsDebuggerPresent();
+#   endif /* _MSC_VER > 1400 */ /* MSVC 2005 */
 #   ifdef __cplusplus
 } /* extern "C" */
 #   endif   /* __cplusplus */

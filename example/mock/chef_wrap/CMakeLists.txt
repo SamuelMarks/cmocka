@@ -4,6 +4,7 @@ include_directories(
     ${CMAKE_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMOCKA_PUBLIC_INCLUDE_DIRS}
+    ${CMAKE_BINARY_DIR}/include
 )
 
 add_executable(waiter_test_wrap waiter_test_wrap.c chef.c)
