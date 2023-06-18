@@ -17,6 +17,7 @@ if (WIN32)
         ${cmocka_SRCS}
         cmocka.def
     )
+    set_source_files_properties(cmocka.def PROPERTIES HEADER_FILE_ONLY TRUE)
 endif (WIN32)
 
 add_library(cmocka ${cmocka_SRCS})
@@ -28,6 +29,7 @@ target_include_directories(cmocka
                            PUBLIC
                                $<BUILD_INTERFACE:${cmocka-header_SOURCE_DIR}>
                                $<BUILD_INTERFACE:${CMAKE_BINARY_DIR/include}>
+                               $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
                                $<INSTALL_INTERFACE:include>)
 
 target_compile_options(cmocka
@@ -54,6 +56,8 @@ set_target_properties(cmocka PROPERTIES
                       LINK_FLAGS            "${DEFAULT_LINK_FLAGS}"
                       C_STANDARD            90
 )
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
 add_library(cmocka::cmocka ALIAS cmocka)
 
@@ -63,6 +67,22 @@ install(TARGETS cmocka
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT ${PROJECT_NAME})
+
+include(GNUInstallDirs)
+include(GenerateExportHeader)
+set(_export_file "${CMAKE_CURRENT_BINARY_DIR}/cmocka_export.h")
+generate_export_header(
+        cmocka::cmocka
+        EXPORT_FILE_NAME "${_export_file}"
+        BASE_NAME "CMOCKA"
+)
+
+install(FILES
+        "${_export_file}"
+        DESTINATION
+        "${CMAKE_INSTALL_INCLUDEDIR}"
+        COMPONENT
+        ${PROJECT_NAME})
 
 install(EXPORT cmocka-targets
         NAMESPACE cmocka::

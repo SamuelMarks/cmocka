@@ -17,6 +17,7 @@
 #ifndef CMOCKA_H_
 #define CMOCKA_H_
 
+#include "cmocka_export.h"
 #if defined(_WIN32) && defined(_MSC_VER)
 
 #define __func__ __FUNCTION__
@@ -117,10 +118,13 @@ int __stdcall IsDebuggerPresent();
 #endif /* __GNUC__ */
 
 #if defined(__GNUC__)
+#undef CMOCKA_DEPRECATED
 #define CMOCKA_DEPRECATED __attribute__ ((deprecated))
 #elif defined(_MSC_VER)
+#undef CMOCKA_DEPRECATED
 #define CMOCKA_DEPRECATED __declspec(deprecated)
 #else
+#undef CMOCKA_DEPRECATED
 #define CMOCKA_DEPRECATED
 #endif
 
@@ -2646,7 +2650,7 @@ void test_free(void *ptr);
  * @see assert(3)
  * @see expect_assert_failure
  */
-void mock_assert(const int result, const char* const expression,
+CMOCKA_EXPORT void mock_assert(const int result, const char* const expression,
                  const char * const file, const int line);
 
 #ifdef DOXYGEN
@@ -2784,215 +2788,215 @@ typedef struct CheckParameterEvent {
 } CheckParameterEvent;
 
 /* Used by expect_assert_failure() and mock_assert(). */
-extern int global_expecting_assert;
-extern jmp_buf global_expect_assert_env;
-extern const char * global_last_failed_assert;
+CMOCKA_EXPORT extern int global_expecting_assert;
+CMOCKA_EXPORT extern jmp_buf global_expect_assert_env;
+CMOCKA_EXPORT extern const char * global_last_failed_assert;
 
 /* Retrieves a value for the given function, as set by "will_return". */
-CMockaValueData _mock(const char *const function,
+CMOCKA_EXPORT CMockaValueData _mock(const char *const function,
                       const char *const file,
                       const int line,
                       const char *name);
 
-void _expect_function_call(
+CMOCKA_EXPORT void _expect_function_call(
     const char * const function_name,
     const char * const file,
     const int line,
     const int count);
 
-void _function_called(const char * const function, const char* const file,
+CMOCKA_EXPORT void _function_called(const char * const function, const char* const file,
                           const int line);
 
-void _expect_check(
+CMOCKA_EXPORT void _expect_check(
     const char* const function, const char* const parameter,
     const char* const file, const int line,
     const CheckParameterValue check_function,
     const CMockaValueData check_data, CheckParameterEvent * const event,
     const int count);
 
-void _expect_in_set(
+CMOCKA_EXPORT void _expect_in_set(
     const char* const function, const char* const parameter,
     const char* const file, const int line, const uintmax_t values[],
     const size_t number_of_values, const int count);
-void _expect_not_in_set(
+CMOCKA_EXPORT void _expect_not_in_set(
     const char* const function, const char* const parameter,
     const char* const file, const int line, const uintmax_t values[],
     const size_t number_of_values, const int count);
 
-void _expect_in_range(
+CMOCKA_EXPORT void _expect_in_range(
     const char* const function, const char* const parameter,
     const char* const file, const int line,
     const uintmax_t minimum,
     const uintmax_t maximum, const int count);
-void _expect_not_in_range(
+CMOCKA_EXPORT void _expect_not_in_range(
     const char* const function, const char* const parameter,
     const char* const file, const int line,
     const uintmax_t minimum,
     const uintmax_t maximum, const int count);
 
-void _expect_value(
+CMOCKA_EXPORT void _expect_value(
     const char* const function, const char* const parameter,
     const char* const file, const int line, const uintmax_t value,
     const int count);
-void _expect_not_value(
+CMOCKA_EXPORT void _expect_not_value(
     const char* const function, const char* const parameter,
     const char* const file, const int line, const uintmax_t value,
     const int count);
 
-void _expect_string(
+CMOCKA_EXPORT void _expect_string(
     const char* const function, const char* const parameter,
     const char* const file, const int line, const char* string,
     const int count);
-void _expect_not_string(
+CMOCKA_EXPORT void _expect_not_string(
     const char* const function, const char* const parameter,
     const char* const file, const int line, const char* string,
     const int count);
 
-void _expect_memory(
+CMOCKA_EXPORT void _expect_memory(
     const char* const function, const char* const parameter,
     const char* const file, const int line, const void* const memory,
     const size_t size, const int count);
-void _expect_not_memory(
+CMOCKA_EXPORT void _expect_not_memory(
     const char* const function, const char* const parameter,
     const char* const file, const int line, const void* const memory,
     const size_t size, const int count);
 
-void _expect_any(
+CMOCKA_EXPORT void _expect_any(
     const char* const function, const char* const parameter,
     const char* const file, const int line, const int count);
 
-void _check_expected(
+CMOCKA_EXPORT void _check_expected(
     const char * const function_name, const char * const parameter_name,
     const char* file, const int line, const CMockaValueData value);
 
-void _will_return(const char *const function_name,
+CMOCKA_EXPORT void _will_return(const char *const function_name,
                   const char *const file,
                   const int line,
                   const char *name,
                   const CMockaValueData value,
                   const int count);
-void _assert_true(const uintmax_t result,
+CMOCKA_EXPORT void _assert_true(const uintmax_t result,
                   const char* const expression,
                   const char * const file, const int line);
-void _assert_return_code(const intmax_t result,
+CMOCKA_EXPORT void _assert_return_code(const intmax_t result,
                          const int32_t error,
                          const char * const expression,
                          const char * const file,
                          const int line);
-void _assert_float_equal(const float a, const float n,
+CMOCKA_EXPORT void _assert_float_equal(const float a, const float n,
 		const float epsilon, const char* const file,
 		const int line);
-void _assert_float_not_equal(const float a, const float n,
+CMOCKA_EXPORT void _assert_float_not_equal(const float a, const float n,
 		const float epsilon, const char* const file,
 		const int line);
-void _assert_double_equal(const double a, const double n,
+CMOCKA_EXPORT void _assert_double_equal(const double a, const double n,
 		const double epsilon, const char* const file,
 		const int line);
-void _assert_double_not_equal(const double a, const double n,
+CMOCKA_EXPORT void _assert_double_not_equal(const double a, const double n,
 		const double epsilon, const char* const file,
 		const int line);
-void _assert_int_equal(const intmax_t a,
+CMOCKA_EXPORT void _assert_int_equal(const intmax_t a,
                        const intmax_t b,
                        const char * const file,
                        const int line);
-void _assert_int_not_equal(const intmax_t a,
+CMOCKA_EXPORT void _assert_int_not_equal(const intmax_t a,
                            const intmax_t b,
                            const char * const file,
                            const int line);
-void _assert_uint_equal(const uintmax_t a,
+CMOCKA_EXPORT void _assert_uint_equal(const uintmax_t a,
                         const uintmax_t b,
                         const char * const file,
                         const int line);
-void _assert_uint_not_equal(const uintmax_t a,
+CMOCKA_EXPORT void _assert_uint_not_equal(const uintmax_t a,
                             const uintmax_t b,
                             const char * const file,
                             const int line);
-void _assert_ptr_equal(const void *a,
+CMOCKA_EXPORT void _assert_ptr_equal(const void *a,
                        const void *b,
                        const char *const file,
                        const int line);
-void _assert_ptr_not_equal(const void *a,
+CMOCKA_EXPORT void _assert_ptr_not_equal(const void *a,
                            const void *b,
                            const char *const file,
                            const int line);
-void _assert_string_equal(const char * const a, const char * const b,
+CMOCKA_EXPORT void _assert_string_equal(const char * const a, const char * const b,
                           const char * const file, const int line);
-void _assert_string_not_equal(const char * const a, const char * const b,
+CMOCKA_EXPORT void _assert_string_not_equal(const char * const a, const char * const b,
                               const char *file, const int line);
-void _assert_memory_equal(const void * const a, const void * const b,
+CMOCKA_EXPORT void _assert_memory_equal(const void * const a, const void * const b,
                           const size_t size, const char* const file,
                           const int line);
-void _assert_memory_not_equal(const void * const a, const void * const b,
+CMOCKA_EXPORT void _assert_memory_not_equal(const void * const a, const void * const b,
                               const size_t size, const char* const file,
                               const int line);
-void _assert_int_in_range(const intmax_t value,
+CMOCKA_EXPORT void _assert_int_in_range(const intmax_t value,
                           const intmax_t minimum,
                           const intmax_t maximum,
                           const char* const file,
                           const int line);
-void _assert_int_not_in_range(const intmax_t value,
+CMOCKA_EXPORT void _assert_int_not_in_range(const intmax_t value,
                               const intmax_t minimum,
                               const intmax_t maximum,
                               const char *const file,
                               const int line);
-void _assert_uint_in_range(const uintmax_t value,
+CMOCKA_EXPORT void _assert_uint_in_range(const uintmax_t value,
                            const uintmax_t minimum,
                            const uintmax_t maximum,
                            const char* const file,
                            const int line);
-void _assert_uint_not_in_range(const uintmax_t value,
+CMOCKA_EXPORT void _assert_uint_not_in_range(const uintmax_t value,
                            const uintmax_t minimum,
                            const uintmax_t maximum,
                            const char* const file,
                            const int line);
-void _assert_not_in_set(
+CMOCKA_EXPORT void _assert_not_in_set(
     const uintmax_t value, const uintmax_t values[],
     const size_t number_of_values, const char* const file, const int line);
-void _assert_int_in_set(const intmax_t value,
+CMOCKA_EXPORT void _assert_int_in_set(const intmax_t value,
                         const intmax_t values[],
                         const size_t number_of_values,
                         const char *const file,
                         const int line);
-void _assert_int_not_in_set(const intmax_t value,
+CMOCKA_EXPORT void _assert_int_not_in_set(const intmax_t value,
                             const intmax_t values[],
                             const size_t number_of_values,
                             const char *const file,
                             const int line);
-void _assert_uint_in_set(const uintmax_t value,
+CMOCKA_EXPORT void _assert_uint_in_set(const uintmax_t value,
                          const uintmax_t values[],
                          const size_t number_of_values,
                          const char *const file,
                          const int line);
-void _assert_uint_not_in_set(const uintmax_t value,
+CMOCKA_EXPORT void _assert_uint_not_in_set(const uintmax_t value,
                              const uintmax_t values[],
                              const size_t number_of_values,
                              const char *const file,
                              const int line);
 
-void* _test_malloc(const size_t size, const char* file, const int line);
-void* _test_realloc(void *ptr, const size_t size, const char* file, const int line);
-void* _test_calloc(const size_t number_of_elements, const size_t size,
+CMOCKA_EXPORT void* _test_malloc(const size_t size, const char* file, const int line);
+CMOCKA_EXPORT void* _test_realloc(void *ptr, const size_t size, const char* file, const int line);
+CMOCKA_EXPORT void* _test_calloc(const size_t number_of_elements, const size_t size,
                    const char* file, const int line);
-void _test_free(void* const ptr, const char* file, const int line);
+CMOCKA_EXPORT void _test_free(void* const ptr, const char* file, const int line);
 
-CMOCKA_NORETURN void _fail(const char * const file, const int line);
+CMOCKA_EXPORT CMOCKA_NORETURN void _fail(const char * const file, const int line);
 
-CMOCKA_NORETURN void _skip(const char * const file, const int line);
+CMOCKA_EXPORT CMOCKA_NORETURN void _skip(const char * const file, const int line);
 
-CMOCKA_NORETURN void _stop(void);
+CMOCKA_EXPORT CMOCKA_NORETURN void _stop(void);
 
 /* Test runner */
-int _cmocka_run_group_tests(const char *group_name,
+CMOCKA_EXPORT int _cmocka_run_group_tests(const char *group_name,
                             const struct CMUnitTest * const tests,
                             const size_t num_tests,
                             CMFixtureFunction group_setup,
                             CMFixtureFunction group_teardown);
 
 /* Standard output and error print methods. */
-void print_message(const char* const format, ...) CMOCKA_PRINTF_ATTRIBUTE(1, 2);
-void print_error(const char* const format, ...) CMOCKA_PRINTF_ATTRIBUTE(1, 2);
-void vprint_message(const char* const format, va_list args) CMOCKA_PRINTF_ATTRIBUTE(1, 0);
-void vprint_error(const char* const format, va_list args) CMOCKA_PRINTF_ATTRIBUTE(1, 0);
+CMOCKA_EXPORT void print_message(const char* const format, ...) CMOCKA_PRINTF_ATTRIBUTE(1, 2);
+CMOCKA_EXPORT void print_error(const char* const format, ...) CMOCKA_PRINTF_ATTRIBUTE(1, 2);
+CMOCKA_EXPORT void vprint_message(const char* const format, va_list args) CMOCKA_PRINTF_ATTRIBUTE(1, 0);
+CMOCKA_EXPORT void vprint_error(const char* const format, va_list args) CMOCKA_PRINTF_ATTRIBUTE(1, 0);
 
 enum cm_message_output {
     CM_OUTPUT_STANDARD = 1,
@@ -3022,7 +3026,7 @@ void cm_print_error(const char* const format, ...);
 
  * @param ...     The parameters used to fill format.
  */
-void cmocka_print_error(const char* const format, ...) CMOCKA_PRINTF_ATTRIBUTE(1, 2);
+CMOCKA_EXPORT void cmocka_print_error(const char* const format, ...) CMOCKA_PRINTF_ATTRIBUTE(1, 2);
 
 /**
  * @brief Function to set the output format for a test.
@@ -3038,7 +3042,7 @@ void cmocka_print_error(const char* const format, ...) CMOCKA_PRINTF_ATTRIBUTE(1
  *                      test. For multiple outputs OR options together.
  *
  */
-void cmocka_set_message_output(uint32_t output);
+CMOCKA_EXPORT void cmocka_set_message_output(uint32_t output);
 
 
 /**
@@ -3051,7 +3055,7 @@ void cmocka_set_message_output(uint32_t output);
  *
  * @param[in]  pattern    The pattern to match, e.g. "test_wurst*"
  */
-void cmocka_set_test_filter(const char *pattern);
+CMOCKA_EXPORT void cmocka_set_test_filter(const char *pattern);
 
 /**
  * @brief Set a pattern to skip tests matching the pattern.
@@ -3063,7 +3067,7 @@ void cmocka_set_test_filter(const char *pattern);
  *
  * @param[in]  pattern    The pattern to match, e.g. "test_wurst*"
  */
-void cmocka_set_skip_filter(const char *pattern);
+CMOCKA_EXPORT void cmocka_set_skip_filter(const char *pattern);
 
 /** @} */
 
