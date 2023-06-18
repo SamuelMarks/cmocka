@@ -17,8 +17,7 @@
 #ifndef CMOCKA_H_
 #define CMOCKA_H_
 
-#ifdef _WIN32
-# ifdef _MSC_VER
+#if defined(_WIN32) && defined(_MSC_VER)
 
 #define __func__ __FUNCTION__
 
@@ -37,8 +36,7 @@ int __stdcall IsDebuggerPresent();
 } /* extern "C" */
 #   endif   /* __cplusplus */
 #  endif  /* _MSC_VER < 1500 */
-# endif /* _MSC_VER */
-#endif  /* _WIN32 */
+# endif /* defined(_WIN32) && defined(_MSC_VER) */
 
 /**
  * @defgroup cmocka The CMocka API
@@ -2254,7 +2252,11 @@ void fail_msg(const char *msg, ...);
 } while (0)
 #endif
 
-static inline void _unit_test_dummy(void **state) {
+static
+#if __STDC_VERSION__ >= 199901L /* C99 */
+    inline
+#endif /* __STDC_VERSION__ >= 199901L */
+    void _unit_test_dummy(void **state) {
     (void)state;
 }
 

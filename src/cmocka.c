@@ -42,7 +42,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if __STDC_VERSION__ < 199901L /* C99 */
+#include <cmocka_stdbool.h>
+#else
 #include <stdbool.h>
+#endif
 #include <time.h>
 #include <float.h>
 #include <errno.h>
@@ -382,7 +386,7 @@ enum CMUnitTestStatus {
     CM_TEST_PASSED,
     CM_TEST_FAILED,
     CM_TEST_ERROR,
-    CM_TEST_SKIPPED,
+    CM_TEST_SKIPPED
 };
 
 struct CMUnitTestState {

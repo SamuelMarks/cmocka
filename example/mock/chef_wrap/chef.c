@@ -22,7 +22,11 @@
 #include <cmocka.h>
 #include <stdio.h>
 #include <errno.h>
+#if __STDC_VERSION__ < 199901L /* C99 */
+#include <cmocka_stdbool.h>
+#else
 #include <stdbool.h>
+#endif
 #include <string.h>
 
 #include "chef.h"

@@ -16,7 +16,11 @@
  */
 
 #include <errno.h>
+#if __STDC_VERSION__ < 199901L /* C99 */
+#include <cmocka_stdbool.h>
+#else
 #include <stdbool.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
