@@ -4,7 +4,12 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
+#if __STDC_VERSION__ < 199901L /* C99 */ || \
+    defined(_MSC_VER) && _MSC_VER < 1600 /* MSVC 2010 */
+#include <cmocka_stdint.h>
+#else
 #include <stdint.h>
+#endif
 #include <cmocka.h>
 
 static int group_setup_failing(void **state)

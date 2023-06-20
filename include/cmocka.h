@@ -47,7 +47,11 @@ int __stdcall IsDebuggerPresent();
  * @code
  * #include <stdarg.h>
  * #include <stddef.h>
+ * #if __STDC_VERSION__ < 199901L || defined(_MSC_VER) && _MSC_VER < 1600
+ * #include <cmocka_stdint.h>
+ * #else
  * #include <stdint.h>
+ * #endif
  * #include <setjmp.h>
  * @endcode
  *

@@ -16,10 +16,13 @@
  */
 
 #include <errno.h>
-#if __STDC_VERSION__ < 199901L /* C99 */
+#if __STDC_VERSION__ < 199901L /* C99 */ || \
+    defined(_MSC_VER) && _MSC_VER < 1600 /* MSVC 2010 */
 #include <cmocka_stdbool.h>
+#include <cmocka_stdint.h>
 #else
 #include <stdbool.h>
+#include <stdint.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,7 +31,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
-#include <stdint.h>
 #include <cmocka.h>
 
 #include "waiter_test_wrap.h"

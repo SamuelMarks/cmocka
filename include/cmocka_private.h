@@ -21,7 +21,12 @@
 #include "config.h"
 #endif
 
+#if __STDC_VERSION__ < 199901L /* C99 */ || \
+    defined(_MSC_VER) && _MSC_VER < 1600 /* MSVC 2010 */
+#include <cmocka_stdint.h>
+#else
 #include <stdint.h>
+#endif
 
 #ifdef _WIN32
 #include <windows.h>

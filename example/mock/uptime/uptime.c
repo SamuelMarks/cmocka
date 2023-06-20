@@ -16,7 +16,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#if __STDC_VERSION__ < 199901L /* C99 */ || \
+    defined(_MSC_VER) && _MSC_VER < 1600 /* MSVC 2010 */
+#include <cmocka_stdint.h>
+#else
 #include <stdint.h>
+#endif
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
