@@ -38,7 +38,7 @@ libcmocka = library('cmocka', 'src/cmocka.c',
                     c_args : ['-DHAVE_CONFIG_H'],
                     include_directories : cmocka_includes,
                     install : meson.is_subproject(),
-                    override_options : ['c_std=gnu99'],
+                    override_options : ['c_std=c89'],
                     dependencies : [cc.find_library('rt', required : false)])
 
 if meson.is_subproject()

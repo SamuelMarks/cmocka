@@ -21,13 +21,15 @@
 #include <cmocka.h>
 #include <stdio.h>
 #include <errno.h>
-#if __STDC_VERSION__ < 199901L /* C99 */ || \
-    defined(_MSC_VER) && _MSC_VER < 1600 /* MSVC 2010 */
-#include <cmocka_stdbool.h>
+#if defined(_MSC_VER) && _MSC_VER < 1600 /* MSVC 2010 */
 #include <cmocka_stdint.h>
 #else
-#include <stdbool.h>
 #include <stdint.h>
+#endif
+#if __STDC_VERSION__ < 199901L || defined(_MSC_VER) && _MSC_VER < 1600
+#include <cmocka_stdbool.h>
+#else
+#include <stdbool.h>
 #endif
 #include <string.h>
 

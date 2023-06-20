@@ -16,8 +16,7 @@
 
 #include <stdarg.h>
 #include <stddef.h>
-#if __STDC_VERSION__ < 199901L /* C99 */ || \
-    defined(_MSC_VER) && _MSC_VER < 1600 /* MSVC 2010 */
+#if defined(_MSC_VER) && _MSC_VER < 1600 /* MSVC 2010 */
 #include <cmocka_stdint.h>
 #else
 #include <stdint.h>
