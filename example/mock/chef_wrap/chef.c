@@ -18,7 +18,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
-#include <cmocka.h>
 #include <stdio.h>
 #include <errno.h>
 #if defined(_MSC_VER) && _MSC_VER < 1600 /* MSVC 2010 */
@@ -31,6 +30,7 @@
 #else
 #include <stdbool.h>
 #endif
+#include <cmocka.h>
 #include <string.h>
 
 #include "chef.h"
