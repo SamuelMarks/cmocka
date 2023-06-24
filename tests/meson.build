@@ -25,7 +25,8 @@ tests = {
 foreach name, should_fail: tests
     exe = executable(name,
                      'test_@0@.c'.format(name),
-                     include_directories: [cmocka_includes],
+                     include_directories: cmocka_includes,
+                     implicit_include_directories: true,
                      link_with: [libcmocka])
     test(name, exe, should_fail: should_fail)
 endforeach

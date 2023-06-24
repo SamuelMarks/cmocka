@@ -95,7 +95,7 @@ fedora/meson:
   stage: build
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-    - meson build -Dunit_testing=true &&
+    - meson setup build -Dunit_testing=true &&
       meson test -C build --print-errorlogs
   tags:
     - shared

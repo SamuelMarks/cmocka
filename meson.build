@@ -33,29 +33,30 @@ conf.set('HAVE_CLOCK_REALTIME', cc.compiles(code, name : 'CLOCK_REALTIME'))
 
 configure_file(output : 'config.h', configuration : conf)
 
-cmocka_includes = [include_directories('.'), include_directories('include')]
-libcmocka = library('cmocka', 'src/cmocka.c',
+subdir('include')
+cmocka_includes = [include_directories('.'), cmocka_include_dir]
+
+libcmocka = library('cmocka', 'src' / 'cmocka.c',
                     c_args : ['-DHAVE_CONFIG_H'],
                     include_directories : cmocka_includes,
+                    implicit_include_directories: true,
                     install : meson.is_subproject(),
                     override_options : ['c_std=c89'],
                     dependencies : [cc.find_library('rt', required : false)])
 
-configured = configure_file(
+cmocka_export_file = configure_file(
       input: 'pregen' / 'cmocka_export.h',
       output: 'cmocka_export.h',
-      configuration: {},
-    )
+      copy: true)
 
-install_data(configured,
-    install_dir: 'src' / 'cmocka_export.h')
-
+install_data(cmocka_export_file)
+install_headers(cmocka_export_file)
 
 if meson.is_subproject()
   cmocka_dep = declare_dependency(include_directories : cmocka_includes,
                                   link_with : libcmocka)
 else
-  install_headers('include/cmocka.h')
+  install_headers('include' / 'cmocka.h')
 
   pkgconfig = import('pkgconfig')
   pkgconfig.generate(libraries : [libcmocka],
