@@ -42,7 +42,7 @@ libcmocka = library('cmocka', 'src/cmocka.c',
                     dependencies : [cc.find_library('rt', required : false)])
 
 fs = import('fs')
-copy = fs.copyfile('pregen/cmocka_export.h', 'src/cmocka_export.h')
+copy = fs.copyfile('pregen' / 'cmocka_export.h', 'src' / 'cmocka_export.h')
 
 if meson.is_subproject()
   cmocka_dep = declare_dependency(include_directories : cmocka_includes,
