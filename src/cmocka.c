@@ -46,10 +46,19 @@
 #else
 #include <stdint.h>
 #endif
+
+#if __STDC_VERSION__ < 199901L || defined(_MSC_VER) && _MSC_VER <= 1900 /* 2015 */
+#define SIZE_T_NUM_FORMAT "l"
+#else
+#define SIZE_T_NUM_FORMAT "z"
+#endif /* __STDC_VERSION__ < 199901L || defined(_MSC_VER) */
+
 #if __STDC_VERSION__ < 199901L || defined(_MSC_VER) && _MSC_VER < 1600
 #include <cmocka_stdbool.h>
+#define BOOL_FORMAT SIZE_T_NUM_FORMAT "u"
 #else
 #include <stdbool.h>
+#define BOOL_FORMAT "jd"
 #endif
 
 #include <time.h>
@@ -1336,11 +1345,19 @@ static bool uint_values_equal_display_error(const uintmax_t left,
 {
     const bool equal = left == right;
     if (!equal) {
-        cmocka_print_error("%ju (%#jx) != %ju (%#jx)\n",
+#if __STDC_VERSION__ < 199901L
+        cmocka_print_error("%"PRIuMAX" (%#"PRIx64") != %"PRIuMAX" (%#"PRIx64")\n",
                            left,
                            left,
                            right,
                            right);
+#else
+        cmocka_print_error("%"PRIuMAX" (%#"PRIx64") != %"PRIuMAX" (%#"PRIx64")\n",
+                           left,
+                           left,
+                           right,
+                           right);
+#endif
     }
     return equal;
 }
@@ -1353,7 +1370,7 @@ static bool int_values_equal_display_error(const intmax_t left,
 {
     const bool equal = left == right;
     if (!equal) {
-        cmocka_print_error("%jd != %jd\n", left, right);
+        cmocka_print_error("%"BOOL_FORMAT" != %"BOOL_FORMAT"\n", left, right);
     }
     return equal;
 }
@@ -1366,7 +1383,7 @@ static bool uint_values_not_equal_display_error(const uintmax_t left,
                                                 const uintmax_t right) {
     const bool not_equal = left != right;
     if (!not_equal) {
-        cmocka_print_error("%ju (%#jx) == %ju (%#jx)\n",
+        cmocka_print_error("%"PRIuMAX" (%#"PRIx64") == %"PRIuMAX" (%#"PRIx64")\n",
                            left,
                            left,
                            right,
@@ -1384,7 +1401,7 @@ static bool int_values_not_equal_display_error(const intmax_t left,
 {
     const bool not_equal = left != right;
     if (!not_equal) {
-        cmocka_print_error("%jd == %jd\n", left, right);
+        cmocka_print_error("%"BOOL_FORMAT" == %"BOOL_FORMAT"\n", left, right);
     }
     return not_equal;
 }
@@ -1439,10 +1456,10 @@ static int value_in_set_display_error(
         if (succeeded) {
             return 1;
         }
-        cmocka_print_error("%ju is %sin the set (",
+        cmocka_print_error("%"PRIuMAX" is %sin the set (",
                        value, invert ? "" : "not ");
         for (i = 0; i < size_of_set; i++) {
-            cmocka_print_error("%#jx, ", set[i]);
+            cmocka_print_error("%#"PRIx64", ", set[i]);
         }
         cmocka_print_error(")\n");
     }
@@ -1474,15 +1491,15 @@ static bool int_value_in_set_display_error(
         if (succeeded) {
             return true;
         }
-        cmocka_print_error("%jd is %sin the set (",
+        cmocka_print_error("%"BOOL_FORMAT" is %sin the set (",
                            value,
                            invert ? "" : "not ");
 
         for (i = 0; i < size_of_set; i++) {
             if (i == size_of_set - 1) {
-                cmocka_print_error("%jd", set[i]);
+                cmocka_print_error("%"BOOL_FORMAT, set[i]);
             } else {
-                cmocka_print_error("%jd, ", set[i]);
+                cmocka_print_error("%"BOOL_FORMAT", ", set[i]);
             }
         }
         cmocka_print_error(")\n");
@@ -1515,12 +1532,12 @@ static bool uint_value_in_set_display_error(
         if (succeeded) {
             return true;
         }
-        cmocka_print_error("%ju is %sin the set (",
+        cmocka_print_error("%"PRIuMAX" is %sin the set (",
                            value,
                            invert ? "" : "not ");
 
         for (i = 0; i < size_of_set; i++) {
-            cmocka_print_error("%ju%s",
+            cmocka_print_error("%"PRIuMAX"%s",
                                set[i],
                                i != size_of_set - 1 ? ", " : "");
         }
@@ -1541,7 +1558,7 @@ static bool uint_in_range_display_error(const uintmax_t value,
         return true;
     }
 
-    cmocka_print_error("%ju is not within the range [%ju, %ju]\n",
+    cmocka_print_error("%"PRIuMAX" is not within the range [%"PRIuMAX", %"PRIuMAX"]\n",
                        value,
                        range_min,
                        range_max);
@@ -1561,7 +1578,7 @@ static bool int_in_range_display_error(const intmax_t value,
         return true;
     }
 
-    cmocka_print_error("%jd is not within the range [%jd, %jd]\n",
+    cmocka_print_error("%"BOOL_FORMAT" is not within the range [%"BOOL_FORMAT", %"BOOL_FORMAT"]\n",
                        value,
                        range_min,
                        range_max);
@@ -1577,7 +1594,7 @@ static bool int_not_in_range_display_error(const intmax_t value,
         return true;
     }
 
-    cmocka_print_error("%jd is within the range [%jd, %jd]\n",
+    cmocka_print_error("%"BOOL_FORMAT" is within the range [%"BOOL_FORMAT", %"BOOL_FORMAT"]\n",
                        value,
                        range_min,
                        range_max);
@@ -1593,7 +1610,7 @@ static bool uint_not_in_range_display_error(const uintmax_t value,
         return true;
     }
 
-    cmocka_print_error("%ju is within the range [%ju, %ju]\n",
+    cmocka_print_error("%"PRIuMAX" is within the range [%"PRIuMAX", %"PRIuMAX"]\n",
                        value,
                        range_min,
                        range_max);
@@ -1613,7 +1630,7 @@ static int integer_not_in_range_display_error(
     if (value < range_min || value > range_max) {
         return 1;
     }
-    cmocka_print_error("%ju is within the range %ju-%ju\n",
+    cmocka_print_error("%"PRIuMAX" is within the range %"PRIuMAX"-%"PRIuMAX"\n",
                        value,
                        range_min,
                        range_max);
@@ -1664,7 +1681,7 @@ static int memory_equal_display_error(const char* const a, const char* const b,
         const char r = b[i];
         if (l != r) {
             if (differences < 16) {
-                cmocka_print_error("difference at offset %" PRIdS " 0x%02x 0x%02x\n",
+                cmocka_print_error("difference at offset %" CMOCKA_PRIdS " 0x%02x 0x%02x\n",
                                i, l, r);
             }
             differences ++;
@@ -1674,7 +1691,7 @@ static int memory_equal_display_error(const char* const a, const char* const b,
         if (differences >= 16) {
             cmocka_print_error("...\n");
         }
-        cmocka_print_error("%"PRIdS " bytes of %p and %p differ\n",
+        cmocka_print_error("%"CMOCKA_PRIdS " bytes of %p and %p differ\n",
                        differences, (void *)a, (void *)b);
         return 0;
     }
@@ -1699,7 +1716,7 @@ static int memory_not_equal_display_error(
         }
     }
     if (same == size) {
-        cmocka_print_error("%"PRIdS "bytes of %p and %p the same\n",
+        cmocka_print_error("%"CMOCKA_PRIdS "bytes of %p and %p the same\n",
                        same, (void *)a, (void *)b);
         return 0;
     }
@@ -2671,7 +2688,7 @@ static void fail_if_blocks_allocated(const ListNode * const check_point,
     const size_t allocated_blocks = display_allocated_blocks(check_point);
     if (allocated_blocks > 0) {
         free_allocated_blocks(check_point);
-        cmocka_print_error("ERROR: %s leaked %zu block(s)\n", test_name,
+        cmocka_print_error("ERROR: %s leaked %"SIZE_T_NUM_FORMAT"u block(s)\n", test_name,
                        allocated_blocks);
         exit_test(true);
     }
@@ -3031,7 +3048,7 @@ static void cmprintf_group_finish_xml(const char *group_name,
 static void cmprintf_group_start_standard(const char *group_name,
                                           const size_t num_tests)
 {
-    print_message("[==========] %s: Running %zu test(s).\n",
+    print_message("[==========] %s: Running %"SIZE_T_NUM_FORMAT"u test(s).\n",
                   group_name,
                   num_tests);
 }
@@ -3046,14 +3063,14 @@ static void cmprintf_group_finish_standard(const char *group_name,
 {
     size_t i;
 
-    print_message("[==========] %s: %zu test(s) run.\n",
+    print_message("[==========] %s: %"SIZE_T_NUM_FORMAT"u test(s) run.\n",
                   group_name,
                   total_executed);
     print_error("[  PASSED  ] %u test(s).\n",
                 (unsigned)(total_passed));
 
     if (total_skipped) {
-        print_error("[  SKIPPED ] %s: %zu test(s), listed below:\n",
+        print_error("[  SKIPPED ] %s: %"SIZE_T_NUM_FORMAT"u test(s), listed below:\n",
                     group_name,
                     total_skipped);
         for (i = 0; i < total_executed; i++) {
@@ -3063,11 +3080,11 @@ static void cmprintf_group_finish_standard(const char *group_name,
                 print_error("[  SKIPPED ] %s\n", cmtest->test->name);
             }
         }
-        print_error("\n %zu SKIPPED TEST(S)\n", total_skipped);
+        print_error("\n %"SIZE_T_NUM_FORMAT"u SKIPPED TEST(S)\n", total_skipped);
     }
 
     if (total_failed) {
-        print_error("[  FAILED  ] %s: %zu test(s), listed below:\n",
+        print_error("[  FAILED  ] %s: %"SIZE_T_NUM_FORMAT"u test(s), listed below:\n",
                     group_name,
                     total_failed);
         for (i = 0; i < total_executed; i++) {
@@ -3077,7 +3094,7 @@ static void cmprintf_group_finish_standard(const char *group_name,
                 print_error("[  FAILED  ] %s\n", cmtest->test->name);
             }
         }
-        print_error("\n %zu FAILED TEST(S)\n",
+        print_error("\n %"SIZE_T_NUM_FORMAT"u FAILED TEST(S)\n",
                     (total_failed + total_errors));
     }
 }

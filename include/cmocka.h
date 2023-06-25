@@ -1960,7 +1960,8 @@ void assert_int_in_set(intmax_t value, intmax_t values[], size_t count);
 #define assert_int_in_set(value, values, number_of_values) \
     if (number_of_values > 0) { \
         intmax_t _cmocka_set[number_of_values]; \
-        for (size_t _i = 0; _i < number_of_values; _i++) { \
+        size_t _i;                                         \
+        for (_i = 0; _i < number_of_values; _i++) { \
             _cmocka_set[_i] = values[_i]; \
         } \
         _assert_int_in_set(value, _cmocka_set, number_of_values, __FILE__, __LINE__); \
@@ -1985,7 +1986,8 @@ void assert_int_not_in_set(intmax_t value, intmax_t values[], size_t count);
 #define assert_int_not_in_set(value, values, number_of_values) \
     if (number_of_values > 0) { \
         intmax_t _cmocka_set[number_of_values]; \
-        for (size_t _i = 0; _i < number_of_values; _i++) { \
+        size_t _i;                                                       \
+        for (_i = 0; _i < number_of_values; _i++) { \
             _cmocka_set[_i] = values[_i]; \
         } \
         _assert_int_not_in_set(value, _cmocka_set, number_of_values, __FILE__, __LINE__); \
@@ -2010,7 +2012,8 @@ void assert_uint_in_set(uintmax_t value, uintmax_t values[], size_t count);
 #define assert_uint_in_set(value, values, number_of_values) \
     if (number_of_values > 0) { \
         uintmax_t _cmocka_set[number_of_values]; \
-        for (size_t _i = 0; _i < number_of_values; _i++) { \
+        size_t _i;                                                    \
+        for (_i = 0; _i < number_of_values; _i++) { \
             _cmocka_set[_i] = values[_i]; \
         } \
         _assert_uint_in_set(value, _cmocka_set, number_of_values, __FILE__, __LINE__); \
@@ -2035,7 +2038,8 @@ void assert_uint_not_in_set(uintmax_t value, uintmax_t values[], size_t count);
 #define assert_uint_not_in_set(value, values, number_of_values) \
     if (number_of_values > 0) { \
         uintmax_t _cmocka_set[number_of_values]; \
-        for (size_t _i = 0; _i < number_of_values; _i++) { \
+        size_t _i;                                                        \
+        for (_i = 0; _i < number_of_values; _i++) { \
             _cmocka_set[_i] = values[_i]; \
         } \
         _assert_uint_not_in_set(value, _cmocka_set, number_of_values, __FILE__, __LINE__); \

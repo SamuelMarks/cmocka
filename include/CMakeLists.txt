@@ -6,10 +6,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmocka_version.h.cmake
 
 set(Header_Files "cmocka.h" "cmocka_pbc.h" "${CMAKE_CURRENT_BINARY_DIR}/cmocka_version.h")
 
-# set(CMAKE_C_VISIBILITY_PRESET hidden)
-# set(CMAKE_VISIBILITY_INLINES_HIDDEN NO)
-set(CMAKE_C_STANDARD 90)
-
 if ((MSVC_VERSION STRLESS "1600"  # MSVC 2010
         OR CMAKE_C_STANDARD EQUAL 90)
         AND EXISTS("${CMAKE_SOURCE_DIR}/include/cmocka_stdbool.h"))

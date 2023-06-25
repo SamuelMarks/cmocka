@@ -1,4 +1,11 @@
 add_library(proc_uptime proc_uptime.c)
+target_include_directories(proc_uptime
+        PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
+        $<INSTALL_INTERFACE:include>)
 
 add_executable(uptime uptime.c)
 target_compile_options(uptime
@@ -7,6 +14,7 @@ target_compile_options(uptime
                            -D_GNU_SOURCE
                            -D_XOPEN_SOURCE=600)
 target_link_libraries(uptime proc_uptime)
+
 set_property(TARGET
                  uptime
              PROPERTY

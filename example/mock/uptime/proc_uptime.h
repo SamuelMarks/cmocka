@@ -17,6 +17,8 @@
 #ifndef _PROC_UPTIME_H
 #define _PROC_UPTIME_H
 
-int uptime(const char *uptime_path, double *uptime_secs, double *idle_secs);
+#include "cmocka_export.h"
 
-#endif /* _PROC_UPTIME_H */
+CMOCKA_EXPORT int uptime(const char *uptime_path, double *uptime_secs, double *idle_secs);
+
+#endif /* !_PROC_UPTIME_H */

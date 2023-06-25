@@ -64,7 +64,16 @@ foreach(_CMOCKA_TEST ${CMOCKA_TESTS})
                     COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS} -D_GNU_SOURCE -D_XOPEN_SOURCE=700
                     LINK_LIBRARIES cmocka::static
                     LINK_OPTIONS ${DEFAULT_LINK_FLAGS})
-    target_include_directories(${_CMOCKA_TEST} PRIVATE ${cmocka_BINARY_DIR})
+    target_include_directories(${_CMOCKA_TEST}
+            PRIVATE
+            ${CMOCKA_PLATFORM_INCLUDE}
+            ${cmocka_BINARY_DIR}
+            PUBLIC
+            $<BUILD_INTERFACE:${cmocka-header_SOURCE_DIR}>
+            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+            $<INSTALL_INTERFACE:include>)
 
     add_cmocka_test_environment(${_CMOCKA_TEST})
 endforeach()

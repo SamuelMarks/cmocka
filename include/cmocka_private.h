@@ -81,8 +81,8 @@
  */
 WINBASEAPI BOOL WINAPI IsDebuggerPresent(VOID);
 
-#ifndef PRIdS
-# define PRIdS "Id"
+#ifndef CMOCKA_PRIdS
+# define CMOCKA_PRIdS "Id"
 #endif
 
 #ifndef PRIu64
@@ -111,9 +111,13 @@ WINBASEAPI BOOL WINAPI IsDebuggerPresent(VOID);
 # endif
 #endif
 
-#ifndef PRIdS
-# define PRIdS "zd"
+#ifndef CMOCKA_PRIdS
+#if __STDC_VERSION__ < 199901L || defined(_MSC_VER) && _MSC_VER <= 1900 /* 2015 */
+# define CMOCKA_PRIdS "ld"
+#else
+# define CMOCKA_PRIdS "zd"
 #endif
+#endif /* ! CMOCKA_PRIdS */
 
 #ifndef PRIu64
 # define PRIu64 __PRI64_PREFIX "u"

@@ -74,11 +74,11 @@ static void mock_test_ptr(const void *value)
 
 static void test_expect_string(void **state)
 {
-    (void)state; /* unused */
     char string[64];
+    (void)state; /* unused */
     snprintf(string, sizeof(string), "hello world");
     assert_ptr_not_equal(string,
-                         "hello world"); // should be different memory addresses
+                         "hello world"); /* should be different memory addresses */
 
     expect_string(mock_test_ptr, value, string);
     mock_test_ptr("hello world");
@@ -95,11 +95,11 @@ static void test_expect_string(void **state)
 
 static void test_expect_string_count_always(void **state)
 {
-    (void)state; /* unused */
     char string[64];
+    (void)state; /* unused */
     snprintf(string, sizeof(string), "hello world");
     assert_ptr_not_equal(string,
-                         "hello world"); // should be different memory addresses
+                         "hello world"); /* should be different memory addresses */
 
     expect_string_count(mock_test_ptr, value, string, EXPECT_ALWAYS);
     mock_test_ptr("hello world");
@@ -108,11 +108,11 @@ static void test_expect_string_count_always(void **state)
 
 static void test_expect_string_count_maybe_1(void **state)
 {
-    (void)state; /* unused */
     char string[64];
+    (void)state; /* unused */
     snprintf(string, sizeof(string), "hello world");
     assert_ptr_not_equal(string,
-                         "hello world"); // should be different memory addresses
+                         "hello world"); /* should be different memory addresses */
 
     expect_string_count(mock_test_ptr, value, string, EXPECT_MAYBE);
     mock_test_ptr("hello world");
@@ -121,8 +121,8 @@ static void test_expect_string_count_maybe_1(void **state)
 
 static void test_expect_string_count_maybe_2(void **state)
 {
-    (void)state; /* unused */
     const char string[] = "hello world";
+    (void)state; /* unused */
     expect_string_count(mock_test_ptr, value, string, EXPECT_MAYBE);
 }
 

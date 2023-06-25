@@ -58,9 +58,16 @@ if (UNIX)
 
     # Allow zero for a variadic macro argument
     string(TOLOWER "${CMAKE_C_COMPILER_ID}" _C_COMPILER_ID)
-    if ("${_C_COMPILER_ID}" STREQUAL "clang")
+    if (_C_COMPILER_ID STREQUAL "clang")
         add_c_compiler_flag("-Wno-gnu-zero-variadic-macro-arguments" SUPPORTED_COMPILER_FLAGS)
+    elseif (_C_COMPILER_ID STREQUAL "gnu")
+        add_c_compiler_flag("-Wno-variadic-macros" SUPPORTED_COMPILER_FLAGS)
     endif()
+    if (_C_COMPILER_ID STREQUAL "clang" OR _C_COMPILER_ID STREQUAL "gnu")
+        add_c_compiler_flag("-Wno-unused-function" SUPPORTED_COMPILER_FLAGS)
+        add_c_compiler_flag("-Wno-pedantic" SUPPORTED_COMPILER_FLAGS)
+    endif ()
+    message(STATUS "_C_COMPILER_ID = ${_C_COMPILER_ID}")
 
     add_c_compiler_flag("-fno-common" SUPPORTED_COMPILER_FLAGS)
 

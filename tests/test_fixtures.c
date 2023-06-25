@@ -34,9 +34,9 @@ static void malloc_teardown_test(void **state)
 {
     *state = malloc(1);
     if (*state == NULL) {
-        // do nothing, we're just checking this because otherwise GCC 11
-        // sometimes incorrectly throws a -Werror=maybe-uninitialized error
-        // This is fixed in GCC 12
+        /* do nothing, we're just checking this because otherwise GCC 11
+         * sometimes incorrectly throws a -Werror=maybe-uninitialized error
+         * This is fixed in GCC 12 */
         assert_null(NULL);
     }
     assert_non_null(*state);

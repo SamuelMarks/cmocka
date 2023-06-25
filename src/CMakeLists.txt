@@ -28,7 +28,7 @@ target_include_directories(cmocka
                                ${cmocka_BINARY_DIR}
                            PUBLIC
                                $<BUILD_INTERFACE:${cmocka-header_SOURCE_DIR}>
-                               $<BUILD_INTERFACE:${CMAKE_BINARY_DIR/include}>
+                               $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
                                $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
                                $<INSTALL_INTERFACE:include>)
 
